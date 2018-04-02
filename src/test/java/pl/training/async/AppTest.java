@@ -4,18 +4,10 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Map;
 
-import junit.framework.Assert;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import pl.training.async.Message;
-import pl.training.async.Parser;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class AppTest extends TestCase {
-	public AppTest(String testName) {
-		super(testName);
-	}
-
+public class AppTest {
 	class ParserTestable extends Parser {
 
 		public ParserTestable(ByteBuffer buffer) {
@@ -31,16 +23,13 @@ public class AppTest extends TestCase {
 		return new ParserTestable(getByteBuffer(s));
 	}
 
-	public static Test suite() {
-		return new TestSuite(AppTest.class);
-	}
-
 	private ByteBuffer getByteBuffer(String s) {
 		ByteBuffer b = ByteBuffer.allocate(s.length()).put(s.getBytes(), 0, s.length());
 		return b;
 	}
 
-	public void testParamsSpaceSeparated() {
+	@Test
+	public void paramsSpaceSeparated() {
 		String testLine = "cl:1 te:p abc:444 a:99 c:490\r\n\r\n1";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("cl"), "1".getBytes()));
@@ -50,7 +39,8 @@ public class AppTest extends TestCase {
 		Assert.assertTrue(Arrays.equals(props.get("c"), "490".getBytes()));
 	}
 
-	public void testParamsNewLineSeparated() {
+	@Test
+	public void paramsNewLineSeparated() {
 		String testLine = "cl:1\r\nte:p\r\nabc:444\r\na:99\r\nc:490\r\n\r\n1";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("cl"), "1".getBytes()));
@@ -60,7 +50,8 @@ public class AppTest extends TestCase {
 		Assert.assertTrue(Arrays.equals(props.get("c"), "490".getBytes()));
 	}
 
-	public void testTokenized1() {
+	@Test
+	public void tokenized1() {
 		String testLine = "a:1 b:2 c:3\r\n\r\n";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("a"), "1".getBytes()));
@@ -68,26 +59,30 @@ public class AppTest extends TestCase {
 		Assert.assertTrue(Arrays.equals(props.get("c"), "3".getBytes()));
 	}
 
-	public void testTokenized2() {
+	@Test
+	public void tokenized2() {
 		String testLine = "a:1\r\n\r\n";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("a"), "1".getBytes()));
 	}
 
-	public void testTokenized3() {
+	@Test
+	public void tokenized3() {
 		String testLine = "aaa:1\r\n\r\n";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("aaa"), "1".getBytes()));
 	}
 
-	public void testTokenized4() {
+	@Test
+	public void tokenized4() {
 		String testLine = "aaa:1 bbb:222\r\n\r\n";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("aaa"), "1".getBytes()));
 		Assert.assertTrue(Arrays.equals(props.get("bbb"), "222".getBytes()));
 	}
 
-	public void testTokenized5() {
+	@Test
+	public void tokenized5() {
 		String testLine = "";
 		try {
 			getParser(testLine).publicTokenizer();
@@ -97,7 +92,8 @@ public class AppTest extends TestCase {
 		}
 	}
 
-	public void testTokenized6() {
+	@Test
+	public void tokenized6() {
 		String testLine = "a";
 		try {
 			getParser(testLine).publicTokenizer();
@@ -107,7 +103,8 @@ public class AppTest extends TestCase {
 		}
 	}
 
-	public void testFailInCaseOfPartiallyReadHeaders() {
+	@Test
+	public void failInCaseOfPartiallyReadHeaders() {
 		String testLine = "z:9";
 		try {
 			// partial read was done, detect that headers are incomplete
@@ -118,28 +115,32 @@ public class AppTest extends TestCase {
 		}
 	}
 
-	public void testNewLineBetweenProps() {
+	@Test
+	public void newLineBetweenProps() {
 		String testLine = "x:0\n\ry:9\r\n\r\n";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("x"), "0".getBytes()));
 		Assert.assertTrue(Arrays.equals(props.get("y"), "9".getBytes()));
 	}
 
-	public void testSpaceBeforeAndAfterNewLine() {
+	@Test
+	public void spaceBeforeAndAfterNewLine() {
 		String testLine = "x:0 \n\r y:abcd-xyz\r\n\r\n";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("x"), "0".getBytes()));
 		Assert.assertTrue(Arrays.equals(props.get("y"), "abcd-xyz".getBytes()));
 	}
 
-	public void testHeaderFrameWithDataInjected() {
+	@Test
+	public void headerFrameWithDataInjected() {
 		String testLine = "x:0 \n\r y:abcd-xyz\r\n\r\nDataDataData";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Assert.assertTrue(Arrays.equals(props.get("x"), "0".getBytes()));
 		Assert.assertTrue(Arrays.equals(props.get("y"), "abcd-xyz".getBytes()));
 	}
 
-	public void testBuildMessageWithContentLength() {
+	@Test
+	public void buildMessageWithContentLength() {
 		String testLine = "cl:123\r\n\r\nD";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Message m = Message.build(props);

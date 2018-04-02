@@ -41,7 +41,6 @@ public class Parser {
 			}
 			if (propertyValueEnd - propertyValueStart == 0)
 				throw new IllegalArgumentException("Cannot parse property value");
-
 			byte[] pv = Arrays.copyOfRange(buffer.array(), propertyValueStart,
 					propertyValueStart + propertyValueEnd - propertyValueStart);
 			props.put(propertyNameBuilder.toString(), pv);
@@ -92,12 +91,9 @@ public class Parser {
 			}
 			if (propertyValueEnd - propertyValueStart == 0)
 				throw new IllegalArgumentException("Cannot parse property value");
-
 			byte[] pv = Arrays.copyOfRange(buffer.array(), propertyValueStart,
 					propertyValueStart + propertyValueEnd - propertyValueStart);
-
 			props.put(new String(buffer.array(), propertyNameStart, propertyNameEnd - propertyNameStart), pv);
-
 			// property or line termination
 			endlineCounter = 0;
 			while (idx < buffer.position()) {
@@ -111,7 +107,6 @@ public class Parser {
 				}
 				idx++;
 			}
-
 			if (endlineCounter == 3) {
 				break;
 			}
@@ -122,9 +117,6 @@ public class Parser {
 		int bufferLength = buffer.position();
 		if (idx < bufferLength) {
 			byte[] injected_data = Arrays.copyOfRange(buffer.array(), idx, bufferLength);
-			// byte[] injected_data = new byte[bufferLength - idx];
-			// System.arraycopy(buffer.array(), idx, injected_data, 0,
-			// injected_data.length);
 			props.put(new String("request-data"), injected_data);
 		}
 		return props;
