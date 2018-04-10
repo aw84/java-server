@@ -41,10 +41,10 @@ public class Parser {
 			}
 			if (propertyValueEnd - propertyValueStart == 0)
 				throw new IllegalArgumentException("Cannot parse property value");
-			byte[] pv = Arrays.copyOfRange(buffer.array(), propertyValueStart,
-					propertyValueStart + propertyValueEnd - propertyValueStart);
+			byte[] pv = new byte[propertyValueEnd - propertyValueStart];
+			buffer.position(propertyValueStart);
+			buffer.get(pv, 0, pv.length);
 			props.put(propertyNameBuilder.toString(), pv);
-			// property or line termination
 			endlineCounter = 0;
 			while (idx < bufferLength) {
 				c = buffer.get(idx);
@@ -65,7 +65,9 @@ public class Parser {
 			throw new IllegalArgumentException("End of header marker missing");
 		}
 		if (idx < bufferLength) {
-			byte[] injected_data = Arrays.copyOfRange(buffer.array(), idx, bufferLength);
+			byte[] injected_data = new byte[bufferLength - idx];
+			buffer.position(idx);
+			buffer.get(injected_data, 0, injected_data.length);
 			props.put(new String("request-data"), injected_data);
 		}
 		return props;

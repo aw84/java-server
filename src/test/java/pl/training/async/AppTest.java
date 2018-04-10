@@ -24,7 +24,7 @@ public class AppTest {
 	}
 
 	private ByteBuffer getByteBuffer(String s) {
-		ByteBuffer b = ByteBuffer.allocate(s.length()).put(s.getBytes(), 0, s.length());
+		ByteBuffer b = ByteBuffer.allocateDirect(s.length()).put(s.getBytes(), 0, s.length());
 		return b;
 	}
 
@@ -54,9 +54,9 @@ public class AppTest {
 	public void tokenized1() {
 		String testLine = "a:1 b:2 c:3\r\n\r\n";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
-		Assert.assertTrue(Arrays.equals(props.get("a"), "1".getBytes()));
-		Assert.assertTrue(Arrays.equals(props.get("b"), "2".getBytes()));
-		Assert.assertTrue(Arrays.equals(props.get("c"), "3".getBytes()));
+		Assert.assertArrayEquals("1".getBytes(), props.get("a"));
+		Assert.assertArrayEquals("2".getBytes(), props.get("b"));
+		Assert.assertArrayEquals("3".getBytes(), props.get("c"));
 	}
 
 	@Test
@@ -135,8 +135,8 @@ public class AppTest {
 	public void headerFrameWithDataInjected() {
 		String testLine = "x:0 \n\r y:abcd-xyz\r\n\r\nDataDataData";
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
-		Assert.assertTrue(Arrays.equals(props.get("x"), "0".getBytes()));
-		Assert.assertTrue(Arrays.equals(props.get("y"), "abcd-xyz".getBytes()));
+		Assert.assertArrayEquals("0".getBytes(), props.get("x"));
+		Assert.assertArrayEquals("abcd-xyz".getBytes(), props.get("y"));
 	}
 
 	@Test
@@ -145,5 +145,14 @@ public class AppTest {
 		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
 		Message m = Message.build(props);
 		Assert.assertEquals(123, m.getContentLength());
+	}
+
+	@Test
+	public void getInjectedData() {
+		String testLine = "cl:1\r\n\r\nD";
+		Map<String, byte[]> props = getParser(testLine).publicTokenizer();
+		Message m = Message.build(props);
+		Assert.assertEquals(1, m.getContentLength());
+		Assert.assertArrayEquals("D".getBytes(), m.getBody());
 	}
 }

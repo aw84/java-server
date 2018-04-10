@@ -22,7 +22,7 @@ public class EchoServer implements CompletionHandler<AsynchronousSocketChannel, 
 
 	public void completed(AsynchronousSocketChannel result, Object attachment) {
 		accept();
-		ByteBuffer buffer = ByteBuffer.allocate(MAX_MESSAGE_SIZE); // Note: allocateDirect?
+		ByteBuffer buffer = ByteBuffer.allocateDirect(MAX_MESSAGE_SIZE);
 		Map<String, Object> context = new HashMap<String, Object>();
 		context.put("operation", "read-headers");
 		buffer.clear();
@@ -48,7 +48,6 @@ public class EchoServer implements CompletionHandler<AsynchronousSocketChannel, 
 		}
 
 		public void completed(Integer result, Object attachment) {
-			System.out.println("Resutl: " + result + "  Op: " + context.get("operation"));
 			ByteBuffer buffer = (ByteBuffer) context.get("buffer");
 			AsynchronousSocketChannel ch = (AsynchronousSocketChannel) context.get("clientChannel");
 			if ("read-headers".equals(context.get("operation"))) {
@@ -93,12 +92,6 @@ public class EchoServer implements CompletionHandler<AsynchronousSocketChannel, 
 		}
 
 		private void reverse(ByteBuffer buffer) {
-			int bufferPossition = buffer.position();
-			for (int i = 0; i < bufferPossition / 2; i++) {
-				byte toFlip = buffer.array()[i];
-				buffer.array()[i] = buffer.array()[bufferPossition - i - 1];
-				buffer.array()[bufferPossition - i - 1] = toFlip;
-			}
 		}
 
 		public void failed(Throwable exc, Object attachment) {
