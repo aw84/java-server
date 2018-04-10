@@ -3,7 +3,6 @@ package pl.training.async;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
