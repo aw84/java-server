@@ -8,13 +8,36 @@ import pl.training.buffer.BufferAllocator;
 
 public class BufferAllocatorTest {
 
-	private final static BufferAllocator bufferAllocator = new BufferAllocator();
-
 	@Test
 	public void allocate() {
-		Buffer b = bufferAllocator.allocate(10);
-		b.read();
+		Buffer b = BufferAllocator.allocate(10);
+		Assert.assertEquals(10, b.size());
+	}
+
+	@Test
+	public void upsize() {
+		Buffer b = BufferAllocator.allocate(10);
+		b.resize(15);
+		Assert.assertEquals(15, b.size());
+	}
+
+	@Test
+	public void downsize() {
+		Buffer b = BufferAllocator.allocate(10);
+		b.resize(5);
+		Assert.assertEquals(5, b.size());
+	}
+
+	// TODO: @Test
+	public void dataPreservation() {
+		Buffer b = BufferAllocator.allocate(3);
 		b.write((byte) 'a');
-		Assert.assertTrue(true);
+		b.write((byte) 'b');
+		b.write((byte) 'c');
+		b.resize(5);
+		b.write((byte) 'd');
+		Assert.assertEquals((byte) 'a', b.read());
+		Assert.assertEquals((byte) 'b', b.read());
+		Assert.assertEquals((byte) 'c', b.read());
 	}
 }
